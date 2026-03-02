@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>💕 仁凱 & 佳旻 愛情大測驗 💕</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans TC', sans-serif;
+    background: linear-gradient(135deg, #fce4ec 0%, #f3e5f5 50%, #e8eaf6 100%);
+    min-height: 100vh;
+    color: #333;
+  }
+
+  .container {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+
+  /* === 開場畫面 === */
+  #intro-screen {
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeIn 0.8s ease;
+  }
+
+  #intro-screen h1 {
+    font-size: 2rem;
+    background: linear-gradient(135deg, #e91e63, #9c27b0);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 12px;
+  }
+
+  #intro-screen p {
+    color: #666;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .role-btn {
+    display: block;
+    width: 100%;
+    max-width: 320px;
+    margin: 12px auto;
+    padding: 18px 24px;
+    border: none;
+    border-radius: 16px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+  }
+
+  .role-btn.kai {
+    background: linear-gradient(135deg, #42a5f5, #1565c0);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(21,101,192,0.3);
+  }
+
+  .role-btn.min {
+    background: linear-gradient(135deg, #ec407a, #c2185b);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(194,24,91,0.3);
+  }
+
+  .role-btn:hover { transform: translateY(-2px); filter: brightness(1.08); }
+  .role-btn:active { transform: translateY(0); }
+
+  .view-records-btn {
+    display: inline-block;
+    margin-top: 24px;
+    padding: 10px 24px;
+    background: rgba(255,255,255,0.7);
+    border: 2px solid #ce93d8;
+    border-radius: 12px;
+    color: #7b1fa2;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+  .view-records-btn:hover { background: #ce93d8; color: #fff; }
+
+  /* === 月份選擇 === */
+  #month-screen {
+    animation: fadeIn 0.5s ease;
+  }
+
+  .screen-header {
+    text-align: center;
+    padding: 20px 0;
+  }
+
+  .screen-header h2 {
+    font-size: 1.4rem;
+    color: #6a1b9a;
+    margin-bottom: 6px;
+  }
+
+  .screen-header .subtitle {
+    font-size: 0.85rem;
+    color: #999;
+  }
+
+  .month-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    padding: 10px 0;
+  }
+
+  .month-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .month-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+
+  .month-card .month-label {
+    font-size: 0.8rem;
+    color: #999;
+  }
+
+  .month-card .month-num {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #6a1b9a;
+    margin: 4px 0;
+  }
+
+  .month-card .month-tag {
+    font-size: 0.7rem;
+    color: #e91e63;
+  }
+
+  .month-card.completed::after {
+    content: '✓';
+    position: absolute;
+    top: 6px;
+    right: 8px;
+    font-size: 0.8rem;
+    color: #4caf50;
+    font-weight: bold;
+  }
+
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 16px;
+    background: rgba(255,255,255,0.8);
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    font-family: inherit;
+    color: #666;
+    transition: all 0.2s;
+  }
+  .back-btn:hover { background: #fff; }
+
+  /* === 測驗畫面 === */
+  #quiz-screen {
+    animation: fadeIn 0.5s ease;
+  }
+
+  .quiz-progress {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin: 16px 0;
+  }
+
+  .progress-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #e0e0e0;
+    transition: all 0.3s;
+  }
+
+  .progress-dot.active { background: #e91e63; transform: scale(1.2); }
+  .progress-dot.done { background: #4caf50; }
+
+  .question-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 28px 24px;
+    margin: 16px 0;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    animation: slideUp 0.4s ease;
+  }
+
+  .question-num {
+    font-size: 0.75rem;
+    color: #e91e63;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .question-text {
+    font-size: 1.1rem;
+    font-weight: 500;
+    line-height: 1.7;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .option-btn {
+    display: block;
+    width: 100%;
+    padding: 14px 18px;
+    background: #f5f5f5;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-family: inherit;
+    color: #333;
+    line-height: 1.5;
+  }
+
+  .option-btn:hover { background: #ede7f6; border-color: #ce93d8; }
+
+  .option-btn.selected {
+    background: #e8eaf6;
+    border-color: #5c6bc0;
+    color: #283593;
+    font-weight: 500;
+  }
+
+  .option-btn.correct {
+    background: #e8f5e9;
+    border-color: #4caf50;
+    color: #2e7d32;
+  }
+
+  .option-btn.wrong {
+    background: #fce4ec;
+    border-color: #e91e63;
+    color: #c62828;
+  }
+
+  .option-btn.disabled {
+    cursor: default;
+    opacity: 0.7;
+  }
+
+  .answer-reveal {
+    margin-top: 16px;
+    padding: 16px;
+    background: linear-gradient(135deg, #fce4ec, #f3e5f5);
+    border-radius: 12px;
+    animation: fadeIn 0.4s ease;
+  }
+
+  .answer-reveal .answer-label {
+    font-size: 0.8rem;
+    color: #e91e63;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .answer-reveal .answer-text {
+    font-size: 0.9rem;
+    color: #555;
+    line-height: 1.6;
+  }
+
+  .next-btn {
+    width: 100%;
+    padding: 14px;
+    margin-top: 16px;
+    background: linear-gradient(135deg, #7c4dff, #536dfe);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.3s;
+    box-shadow: 0 4px 12px rgba(124,77,255,0.3);
+  }
+
+  .next-btn:hover { filter: brightness(1.1); transform: translateY(-1px); }
+
+  /* === 結果畫面 === */
+  #result-screen {
+    text-align: center;
+    padding: 40px 20px;
+    animation: fadeIn 0.6s ease;
+  }
+
+  .result-circle {
+    width: 140px;
+    height: 140px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #e91e63, #9c27b0);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    box-shadow: 0 8px 30px rgba(233,30,99,0.3);
+  }
+
+  .result-circle .score {
+    color: #fff;
+    font-size: 2.2rem;
+    font-weight: 700;
+  }
+
+  .result-msg {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #6a1b9a;
+    margin-bottom: 8px;
+  }
+
+  .result-sub {
+    color: #888;
+    font-size: 0.9rem;
+    margin-bottom: 30px;
+  }
+
+  .result-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .result-actions button {
+    padding: 12px 24px;
+    border-radius: 12px;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, #e91e63, #c2185b);
+    color: #fff;
+    box-shadow: 0 4px 12px rgba(233,30,99,0.3);
+  }
+
+  .btn-secondary {
+    background: #fff;
+    color: #6a1b9a;
+    border: 2px solid #ce93d8 !important;
+  }
+
+  /* === 記錄畫面 === */
+  #records-screen {
+    animation: fadeIn 0.5s ease;
+  }
+
+  .record-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .record-info {
+    flex: 1;
+  }
+
+  .record-info .record-month {
+    font-weight: 700;
+    color: #333;
+    font-size: 0.95rem;
+  }
+
+  .record-info .record-date {
+    font-size: 0.75rem;
+    color: #999;
+    margin-top: 2px;
+  }
+
+  .record-score {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #e91e63;
+  }
+
+  .no-records {
+    text-align: center;
+    padding: 60px 20px;
+    color: #999;
+  }
+
+  .tab-bar {
+    display: flex;
+    gap: 0;
+    margin-bottom: 16px;
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+
+  .tab-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    background: transparent;
+    font-size: 0.9rem;
+    font-family: inherit;
+    cursor: pointer;
+    color: #999;
+    font-weight: 500;
+    transition: all 0.3s;
+  }
+
+  .tab-btn.active {
+    background: linear-gradient(135deg, #e91e63, #c2185b);
+    color: #fff;
+  }
+
+  .clear-btn {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    background: #ffebee;
+    color: #c62828;
+    border: 1px solid #ef9a9a;
+    border-radius: 10px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-family: inherit;
+  }
+
+  /* === 動畫 === */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 開場選擇身份 -->
+  <div id="intro-screen">
+    <h1>仁凱 & 佳旻<br>愛情大測驗</h1>
+    <p>兩年多的點點滴滴，你還記得多少？<br>選擇你的身份開始測驗吧！</p>
+    <button class="role-btn kai" onclick="selectRole('kai')">🙋‍♂️ 我是仁凱</button>
+    <button class="role-btn min" onclick="selectRole('min')">🙋‍♀️ 我是佳旻</button>
+    <button class="view-records-btn" onclick="showRecords()">📊 查看歷史記錄</button>
+  </div>
+
+  <!-- 月份選擇 -->
+  <div id="month-screen" class="hidden">
+    <button class="back-btn" onclick="goHome()">← 返回</button>
+    <div class="screen-header">
+      <h2 id="month-title"></h2>
+      <div class="subtitle">選擇月份開始測驗（每月3題）</div>
+    </div>
+    <div class="month-grid" id="month-grid"></div>
+  </div>
+
+  <!-- 測驗 -->
+  <div id="quiz-screen" class="hidden">
+    <button class="back-btn" onclick="backToMonths()">← 返回月份</button>
+    <div class="screen-header">
+      <h2 id="quiz-month-title"></h2>
+    </div>
+    <div class="quiz-progress" id="quiz-progress"></div>
+    <div class="question-card" id="question-card">
+      <div class="question-num" id="q-num"></div>
+      <div class="question-text" id="q-text"></div>
+      <div class="options" id="q-options"></div>
+      <div class="answer-reveal hidden" id="answer-reveal">
+        <div class="answer-label">💡 小故事</div>
+        <div class="answer-text" id="answer-text"></div>
+      </div>
+      <button class="next-btn hidden" id="next-btn" onclick="nextQuestion()">下一題 →</button>
+    </div>
+  </div>
+
+  <!-- 結果 -->
+  <div id="result-screen" class="hidden">
+    <div class="result-circle">
+      <div class="score" id="final-score"></div>
+    </div>
+    <div class="result-msg" id="result-msg"></div>
+    <div class="result-sub" id="result-sub"></div>
+    <div class="result-actions">
+      <button class="btn-primary" onclick="backToMonths()">繼續其他月份</button>
+      <button class="btn-secondary" onclick="goHome()">回首頁</button>
+    </div>
+  </div>
+
+  <!-- 記錄 -->
+  <div id="records-screen" class="hidden">
+    <button class="back-btn" onclick="goHome()">← 返回</button>
+    <div class="screen-header">
+      <h2>📊 測驗記錄</h2>
+    </div>
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="switchRecordTab('kai', this)">🙋‍♂️ 仁凱</button>
+      <button class="tab-btn" onclick="switchRecordTab('min', this)">🙋‍♀️ 佳旻</button>
+    </div>
+    <div id="records-list"></div>
+    <button class="clear-btn" onclick="clearRecords()">🗑️ 清除所有記錄</button>
+  </div>
+</div>
+
+<script src="quiz-data.js"></script>
+<script>
+// ===== 狀態管理 =====
+let currentRole = '';
+let currentMonth = '';
+let currentQuestions = [];
+let currentQIndex = 0;
+let correctCount = 0;
+let answered = false;
+
+// ===== 畫面切換 =====
+function hideAll() {
+  ['intro-screen','month-screen','quiz-screen','result-screen','records-screen']
+    .forEach(id => document.getElementById(id).classList.add('hidden'));
+}
+
+function showScreen(id) {
+  hideAll();
+  document.getElementById(id).classList.remove('hidden');
+}
+
+function goHome() {
+  showScreen('intro-screen');
+}
+
+// ===== 選擇身份 =====
+function selectRole(role) {
+  currentRole = role;
+  showScreen('month-screen');
+  document.getElementById('month-title').textContent =
+    role === 'kai' ? '🙋‍♂️ 仁凱的測驗' : '🙋‍♀️ 佳旻的測驗';
+  renderMonthGrid();
+}
+
+// ===== 月份列表 =====
+function renderMonthGrid() {
+  const grid = document.getElementById('month-grid');
+  grid.innerHTML = '';
+  const months = Object.keys(quizData[currentRole]).sort();
+  const records = getRecords();
+
+  months.forEach(m => {
+    const [y, mo] = m.split('-');
+    const card = document.createElement('div');
+    card.className = 'month-card';
+
+    // 檢查是否已完成
+    const key = currentRole + '_' + m;
+    if (records[key]) card.classList.add('completed');
+
+    const tags = {
+      '2023-09': '初識',
+      '2023-10': '在一起！',
+      '2023-11': '熱戀期',
+      '2023-12': '第一個聖誕',
+      '2024-01': '跨年回憶',
+      '2024-02': '第一個情人節',
+      '2024-03': '春天來了',
+      '2024-04': '日常甜蜜',
+      '2024-05': '五月天',
+      '2024-06': '夏日開始',
+      '2024-07': '一起冒險',
+      '2024-08': '周年前夕',
+      '2024-09': '一周年快樂',
+      '2024-10': '秋天散步',
+      '2024-11': '冬天來了',
+      '2024-12': '第二個聖誕',
+      '2025-01': '新年快樂',
+      '2025-02': '情人節',
+      '2025-03': '春暖花開',
+      '2025-04': '雨季浪漫',
+      '2025-05': '初夏微風',
+      '2025-06': '夏日約會',
+      '2025-07': '盛夏回憶',
+      '2025-08': '颱風天',
+      '2025-09': '兩周年',
+      '2025-10': '秋意濃',
+      '2025-11': '感恩有你',
+      '2025-12': '歲末年終',
+      '2026-01': '新年新氣象',
+      '2026-02': '當下此刻',
+    };
+
+    card.innerHTML = `
+      <div class="month-label">${y}年</div>
+      <div class="month-num">${parseInt(mo)}月</div>
+      <div class="month-tag">${tags[m] || ''}</div>
+    `;
+    card.onclick = () => startQuiz(m);
+    grid.appendChild(card);
+  });
+}
+
+// ===== 開始測驗 =====
+function startQuiz(month) {
+  currentMonth = month;
+  currentQuestions = quizData[currentRole][month];
+  if (!currentQuestions || currentQuestions.length === 0) {
+    alert('這個月份還沒有題目喔！');
+    return;
+  }
+  currentQIndex = 0;
+  correctCount = 0;
+
+  showScreen('quiz-screen');
+
+  const [y, mo] = month.split('-');
+  document.getElementById('quiz-month-title').textContent = `${y}年${parseInt(mo)}月`;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = currentQuestions[currentQIndex];
+
+  // 進度點
+  const progress = document.getElementById('quiz-progress');
+  progress.innerHTML = '';
+  for (let i = 0; i < currentQuestions.length; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'progress-dot';
+    if (i < currentQIndex) dot.classList.add('done');
+    if (i === currentQIndex) dot.classList.add('active');
+    progress.appendChild(dot);
+  }
+
+  document.getElementById('q-num').textContent = `QUESTION ${currentQIndex + 1} / ${currentQuestions.length}`;
+  document.getElementById('q-text').textContent = q.question;
+
+  const optionsDiv = document.getElementById('q-options');
+  optionsDiv.innerHTML = '';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i, q.answer);
+    optionsDiv.appendChild(btn);
+  });
+
+  document.getElementById('answer-reveal').classList.add('hidden');
+  document.getElementById('answer-text').textContent = '';
+  document.getElementById('next-btn').classList.add('hidden');
+}
+
+function selectAnswer(selected, correct) {
+  if (answered) return;
+  answered = true;
+
+  const btns = document.querySelectorAll('#q-options .option-btn');
+  btns.forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if (i === correct) btn.classList.add('correct');
+    if (i === selected && selected !== correct) btn.classList.add('wrong');
+  });
+
+  if (selected === correct) correctCount++;
+
+  const q = currentQuestions[currentQIndex];
+  document.getElementById('answer-text').textContent = q.explanation;
+  document.getElementById('answer-reveal').classList.remove('hidden');
+  document.getElementById('next-btn').classList.remove('hidden');
+  document.getElementById('next-btn').textContent =
+    currentQIndex < currentQuestions.length - 1 ? '下一題 →' : '看結果 🎉';
+}
+
+function nextQuestion() {
+  currentQIndex++;
+  if (currentQIndex < currentQuestions.length) {
+    renderQuestion();
+    document.getElementById('question-card').style.animation = 'none';
+    void document.getElementById('question-card').offsetHeight;
+    document.getElementById('question-card').style.animation = 'slideUp 0.4s ease';
+  } else {
+    showResult();
+  }
+}
+
+// ===== 結果 =====
+function showResult() {
+  showScreen('result-screen');
+
+  const total = currentQuestions.length;
+  const pct = Math.round((correctCount / total) * 100);
+  document.getElementById('final-score').textContent = `${correctCount}/${total}`;
+
+  let msg = '';
+  let sub = '';
+  if (pct === 100) {
+    msg = '滿分！完美默契！';
+    sub = '你們真的超了解彼此，太甜了吧 💕';
+  } else if (pct >= 67) {
+    msg = '很厲害喔！';
+    sub = '記憶力不錯～繼續保持這份用心 ❤️';
+  } else if (pct >= 34) {
+    msg = '還可以啦～';
+    sub = '有些小細節忘記了，去翻聊天記錄回憶一下吧 😂';
+  } else {
+    msg = '需要加油！';
+    sub = '是不是都在滑手機沒認真看訊息 🤣';
+  }
+
+  document.getElementById('result-msg').textContent = msg;
+  document.getElementById('result-sub').textContent = sub;
+
+  // 儲存記錄
+  saveRecord(currentRole, currentMonth, correctCount, total);
+}
+
+// ===== 記錄管理 =====
+function getRecords() {
+  try {
+    return JSON.parse(localStorage.getItem('loveQuizRecords') || '{}');
+  } catch { return {}; }
+}
+
+function saveRecord(role, month, correct, total) {
+  const records = getRecords();
+  const key = role + '_' + month;
+  records[key] = {
+    role, month, correct, total,
+    date: new Date().toLocaleDateString('zh-TW'),
+    time: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit' })
+  };
+  localStorage.setItem('loveQuizRecords', JSON.stringify(records));
+}
+
+function showRecords() {
+  showScreen('records-screen');
+  switchRecordTab('kai', document.querySelector('.tab-btn'));
+}
+
+function switchRecordTab(role, btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderRecordsList(role);
+}
+
+function renderRecordsList(role) {
+  const records = getRecords();
+  const list = document.getElementById('records-list');
+  const filtered = Object.values(records)
+    .filter(r => r.role === role)
+    .sort((a, b) => a.month.localeCompare(b.month));
+
+  if (filtered.length === 0) {
+    list.innerHTML = '<div class="no-records">還沒有測驗記錄喔～<br>快去做測驗吧！</div>';
+    return;
+  }
+
+  list.innerHTML = filtered.map(r => {
+    const [y, mo] = r.month.split('-');
+    return `
+      <div class="record-card">
+        <div class="record-info">
+          <div class="record-month">${y}年${parseInt(mo)}月</div>
+          <div class="record-date">${r.date} ${r.time}</div>
+        </div>
+        <div class="record-score">${r.correct}/${r.total}</div>
+      </div>
+    `;
+  }).join('');
+}
+
+function clearRecords() {
+  if (confirm('確定要清除所有記錄嗎？')) {
+    localStorage.removeItem('loveQuizRecords');
+    renderRecordsList('kai');
+  }
+}
+
+function backToMonths() {
+  showScreen('month-screen');
+  renderMonthGrid();
+}
+</script>
+
+</body>
+</html>
